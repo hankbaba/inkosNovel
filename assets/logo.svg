@@ -1,0 +1,66 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="inkGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="50%" stop-color="#16213e"/>
+      <stop offset="100%" stop-color="#0f3460"/>
+    </linearGradient>
+    <linearGradient id="penGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e94560"/>
+      <stop offset="100%" stop-color="#c23152"/>
+    </linearGradient>
+    <linearGradient id="dropGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#533483"/>
+      <stop offset="100%" stop-color="#0f3460"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#inkGrad)" stroke="#e94560" stroke-width="3"/>
+
+  <!-- Inner ring - circuit pattern -->
+  <circle cx="256" cy="256" r="210" fill="none" stroke="#533483" stroke-width="1.5" stroke-dasharray="12 6" opacity="0.6"/>
+
+  <!-- Ink drop shape - main icon -->
+  <path d="M256 80 C256 80, 340 190, 340 270 C340 316, 302 360, 256 360 C210 360, 172 316, 172 270 C172 190, 256 80, 256 80Z"
+        fill="url(#dropGrad)" stroke="#e94560" stroke-width="2.5" filter="url(#glow)"/>
+
+  <!-- Quill nib inside the drop -->
+  <path d="M256 140 L240 280 L256 310 L272 280 Z"
+        fill="url(#penGrad)" opacity="0.9"/>
+
+  <!-- Quill split line -->
+  <line x1="256" y1="180" x2="256" y2="300" stroke="#1a1a2e" stroke-width="2" opacity="0.5"/>
+
+  <!-- Circuit nodes around the drop -->
+  <circle cx="190" cy="200" r="4" fill="#e94560" opacity="0.8"/>
+  <circle cx="322" cy="200" r="4" fill="#e94560" opacity="0.8"/>
+  <circle cx="170" cy="290" r="4" fill="#e94560" opacity="0.8"/>
+  <circle cx="342" cy="290" r="4" fill="#e94560" opacity="0.8"/>
+
+  <!-- Circuit lines connecting nodes -->
+  <line x1="190" y1="200" x2="170" y2="290" stroke="#e94560" stroke-width="1.5" opacity="0.4"/>
+  <line x1="322" y1="200" x2="342" y2="290" stroke="#e94560" stroke-width="1.5" opacity="0.4"/>
+
+  <!-- Data flow dots -->
+  <circle cx="150" cy="240" r="2.5" fill="#e94560" opacity="0.6"/>
+  <circle cx="362" cy="240" r="2.5" fill="#e94560" opacity="0.6"/>
+  <circle cx="256" cy="370" r="2.5" fill="#e94560" opacity="0.6"/>
+
+  <!-- Text: InkOS -->
+  <text x="256" y="430" text-anchor="middle" font-family="'SF Pro Display', 'Helvetica Neue', Arial, sans-serif" font-size="52" font-weight="700" fill="#ffffff" letter-spacing="6">
+    InkOS
+  </text>
+
+  <!-- Subtitle -->
+  <text x="256" y="460" text-anchor="middle" font-family="'SF Pro Display', 'Helvetica Neue', Arial, sans-serif" font-size="14" fill="#e94560" letter-spacing="4" opacity="0.9">
+    MULTI-AGENT NOVEL ENGINE
+  </text>
+</svg>
