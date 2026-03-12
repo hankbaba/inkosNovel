@@ -5,7 +5,7 @@
 <h1 align="center">InkOS</h1>
 
 <p align="center">
-  <strong>AI 小说写作 CLI</strong>
+  <strong>自主智能体小说写作 CLI</strong>
 </p>
 
 <p align="center">
