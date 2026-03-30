@@ -1,4 +1,4 @@
-import { readFile, writeFile, mkdir, readdir, stat, unlink, open } from "node:fs/promises";
+import { readFile, writeFile, mkdir, readdir, stat, unlink, rm, open } from "node:fs/promises";
 import { join } from "node:path";
 import type { BookConfig } from "../models/book.js";
 import type { ChapterMeta } from "../models/chapter.js";
@@ -308,7 +308,20 @@ export class StateManager {
           );
         }
       } catch {
-        // snapshot structured state missing — skip
+        // Snapshot has no structured state (e.g. snapshot-0 created before any chapter).
+        // Remove current JSON state so stale manifest.lastAppliedChapter
+        // doesn't block the next delta application.
+        try {
+          const stateDir = this.stateDir(bookId);
+          const existing = await readdir(stateDir);
+          await Promise.all(
+            existing.map(async (fileName) => {
+              await rm(join(stateDir, fileName), { force: true });
+            }),
+          );
+        } catch {
+          // no state dir to clean — fine
+        }
       }
 
       return true;

@@ -653,7 +653,23 @@ export class PipelineRunner {
           : undefined,
       });
 
-      if (preRevision.blockingCount === 0 && preRevision.aiTellCount === 0) {
+      // If chapter was rejected with a reason, treat it as a critical audit issue
+      let issuesWithReview = preRevision.auditResult.issues;
+      let blockingCount = preRevision.blockingCount;
+      let criticalCount = preRevision.criticalCount;
+      if (chapterMeta.reviewNote && chapterMeta.status === "rejected") {
+        const reviewIssue: AuditIssue = {
+          severity: "critical",
+          category: "review_rejection",
+          description: chapterMeta.reviewNote,
+          suggestion: "请根据拒绝理由修改章节内容",
+        };
+        issuesWithReview = [reviewIssue, ...preRevision.auditResult.issues];
+        blockingCount++;
+        criticalCount++;
+      }
+
+      if (blockingCount === 0 && preRevision.aiTellCount === 0) {
         return {
           chapterNumber: targetChapter,
           wordCount: countChapterLength(content, countingMode),
@@ -682,7 +698,7 @@ export class PipelineRunner {
         bookDir,
         content,
         targetChapter,
-        preRevision.auditResult.issues,
+        issuesWithReview,
         mode,
         book.genre,
         reviseControlInput

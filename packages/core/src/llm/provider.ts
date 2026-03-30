@@ -159,7 +159,7 @@ export class PartialResponseError extends Error {
 const MIN_SALVAGEABLE_CHARS = 500;
 
 /** Keys managed by the provider layer — prevent extra from overriding them. */
-const RESERVED_KEYS = new Set(["max_tokens", "temperature", "model", "messages", "stream"]);
+const RESERVED_KEYS = new Set(["max_tokens", "temperature", "model", "messages", "stream", "thinking"]);
 
 function stripReservedKeys(extra: Record<string, unknown>): Record<string, unknown> {
   const result: Record<string, unknown> = {};
@@ -240,20 +240,35 @@ export async function chatCompletion(
   const onStreamProgress = options?.onStreamProgress;
   const errorCtx = { baseUrl: client._openai?.baseURL ?? "(anthropic)", model };
 
+  // Debug: log input messages
+  console.log(`\n========== LLM REQUEST [${model}] maxTokens=${resolved.maxTokens} ==========`);
+  for (const msg of messages) {
+    const preview = typeof msg.content === "string"
+      ? msg.content.slice(0, 500) + (msg.content.length > 500 ? "..." : "")
+      : JSON.stringify(msg.content).slice(0, 500);
+    console.log(`[${msg.role}] (${(typeof msg.content === "string" ? msg.content.length : JSON.stringify(msg.content).length)} chars) ${preview}\n`);
+  }
+
   try {
+    let result: LLMResponse;
     if (client.provider === "anthropic") {
-      return client.stream
+      result = client.stream
         ? await chatCompletionAnthropic(client._anthropic!, model, messages, resolved, client.defaults.thinkingBudget, onStreamProgress)
         : await chatCompletionAnthropicSync(client._anthropic!, model, messages, resolved, client.defaults.thinkingBudget);
-    }
-    if (client.apiFormat === "responses") {
-      return client.stream
+    } else if (client.apiFormat === "responses") {
+      result = client.stream
         ? await chatCompletionOpenAIResponses(client._openai!, model, messages, resolved, options?.webSearch, onStreamProgress)
         : await chatCompletionOpenAIResponsesSync(client._openai!, model, messages, resolved, options?.webSearch);
+    } else {
+      result = client.stream
+        ? await chatCompletionOpenAIChat(client._openai!, model, messages, resolved, options?.webSearch, onStreamProgress)
+        : await chatCompletionOpenAIChatSync(client._openai!, model, messages, resolved, options?.webSearch);
     }
-    return client.stream
-      ? await chatCompletionOpenAIChat(client._openai!, model, messages, resolved, options?.webSearch, onStreamProgress)
-      : await chatCompletionOpenAIChatSync(client._openai!, model, messages, resolved, options?.webSearch);
+
+    // Debug: log output
+    const contentPreview = result.content.slice(0, 2000) + (result.content.length > 2000 ? "..." : "");
+    console.log(`========== LLM RESPONSE [${model}] (${result.content.length} chars) ==========\n${contentPreview}\n========== END ==========\n`);
+    return result;
   } catch (error) {
     // Stream interrupted but partial content is usable — return truncated response
     if (error instanceof PartialResponseError) {

@@ -46,7 +46,7 @@ export async function loadProjectConfig(
   if (env.INKOS_LLM_MODEL) llm.model = env.INKOS_LLM_MODEL;
   if (env.INKOS_LLM_TEMPERATURE) llm.temperature = parseFloat(env.INKOS_LLM_TEMPERATURE);
   if (env.INKOS_LLM_MAX_TOKENS) llm.maxTokens = parseInt(env.INKOS_LLM_MAX_TOKENS, 10);
-  if (env.INKOS_LLM_THINKING_BUDGET) llm.thinkingBudget = parseInt(env.INKOS_LLM_THINKING_BUDGET, 10);
+  if (env.INKOS_LLM_THINKING_BUDGET !== undefined) llm.thinkingBudget = parseInt(env.INKOS_LLM_THINKING_BUDGET, 10);
   // Extra params from env: INKOS_LLM_EXTRA_<key>=<value>
   const extraFromEnv: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(env)) {

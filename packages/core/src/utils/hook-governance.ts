@@ -57,22 +57,30 @@ export function evaluateHookAdmission(params: {
     };
   }
 
-  const candidateNormalized = normalizeText([
+  // 关键修复：只从 expectedPayoff 和 notes 中提取特征，排除 type 字段！
+  // 否则两个同类型钩子会因为 type 本身的词（如"设定伏笔"）重叠而误判
+  const candidateContent = normalizeText([
+    params.candidate.expectedPayoff ?? "",
+    params.candidate.notes ?? "",
+  ].join(" "));
+  const candidateTerms = extractTerms(candidateContent);
+  const candidateChineseBigrams = extractChineseBigrams(candidateContent);
+
+  // 完全匹配检查仍然包含 type（用于精确去重）
+  const candidateFullNormalized = normalizeText([
     params.candidate.type,
     params.candidate.expectedPayoff ?? "",
     params.candidate.notes ?? "",
   ].join(" "));
-  const candidateTerms = extractTerms(candidateNormalized);
-  const candidateChineseBigrams = extractChineseBigrams(candidateNormalized);
 
   for (const hook of params.activeHooks) {
-    const activeNormalized = normalizeText([
+    const activeFullNormalized = normalizeText([
       hook.type,
       hook.expectedPayoff,
       hook.notes,
     ].join(" "));
 
-    if (candidateNormalized === activeNormalized) {
+    if (candidateFullNormalized === activeFullNormalized) {
       return {
         admit: false,
         reason: "duplicate_family",
@@ -84,9 +92,14 @@ export function evaluateHookAdmission(params: {
       continue;
     }
 
-    const activeTerms = extractTerms(activeNormalized);
+    // 重叠检查只看内容，不看 type
+    const activeContent = normalizeText([
+      hook.expectedPayoff,
+      hook.notes,
+    ].join(" "));
+    const activeTerms = extractTerms(activeContent);
     const overlap = [...candidateTerms].filter((term) => activeTerms.has(term));
-    const activeChineseBigrams = extractChineseBigrams(activeNormalized);
+    const activeChineseBigrams = extractChineseBigrams(activeContent);
     const chineseOverlap = [...candidateChineseBigrams].filter((term) =>
       activeChineseBigrams.has(term),
     );

@@ -1,7 +1,7 @@
 ---
 name: English Cultivation
 id: cultivation
-language: en
+language: zh
 chapterTypes: ["Training", "Breakthrough", "Combat", "Setup", "Transition", "Payoff"]
 fatigueWords: ["delve", "tapestry", "testament", "intricate", "pivotal", "vibrant", "comprehensive", "nuanced", "embark", "foster", "underscore", "bolstered", "crucial"]
 numericalSystem: false
